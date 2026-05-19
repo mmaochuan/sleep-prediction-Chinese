@@ -567,7 +567,6 @@ def main():
         st.info(f"""
         **模型类型**: {features_info['best_model_name']}  
         **特征数量**: {len(features_info['selected_features'])}  
-        **AUC**: {features_info.get('best_auc', 'N/A')}
         """)
 
         st.markdown("### 📋 使用说明")
