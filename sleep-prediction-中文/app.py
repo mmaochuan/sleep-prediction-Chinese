@@ -440,41 +440,20 @@ def preprocess_input(data, features_info, ordinal_encoder, scaler_cont):
 
 
 def configure_chinese_fonts():
-    """配置中文字体显示"""
-    import platform
+    """配置中文字体显示（字体文件与app.py同目录）"""
     import matplotlib.font_manager as fm
 
-    system = platform.system()
+    font_path = os.path.join(os.path.dirname(__file__), 'NotoSerifSC-Regular.otf')
 
-    # 获取系统可用字体
-    available_fonts = set([f.name for f in fm.fontManager.ttflist])
-
-    # 定义不同平台的首选字体
-    if system == 'Windows':
-        preferred_fonts = ['Microsoft YaHei', 'SimHei', 'SimSun', 'KaiTi', 'Arial Unicode MS']
-    elif system == 'Darwin':  # macOS
-        preferred_fonts = ['Arial Unicode MS', 'PingFang SC', 'Heiti SC', 'STHeiti']
-    else:  # Linux / Cloud
-        preferred_fonts = [
-            'WenQuanYi Micro Hei', 'WenQuanYi Zen Hei', 'Noto Sans CJK SC',
-            'Droid Sans Fallback', 'AR PL UMing CN', 'Noto Sans SC'
-        ]
-
-    # 添加通用备选字体
-    preferred_fonts.extend(['DejaVu Sans', 'sans-serif'])
-
-    # 找到第一个可用的字体
-    for font in preferred_fonts:
-        if font in available_fonts:
-            plt.rcParams['font.sans-serif'] = [font]
-            break
+    if os.path.exists(font_path):
+        fm.fontManager.addfont(font_path)
+        prop = fm.FontProperties(fname=font_path)
+        plt.rcParams['font.sans-serif'] = [prop.get_name(), 'DejaVu Sans']
     else:
-        # 如果都不可用，使用所有备选字体
-        plt.rcParams['font.sans-serif'] = preferred_fonts
+        plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 
     plt.rcParams['axes.unicode_minus'] = False
     plt.rcParams['font.family'] = 'sans-serif'
-
 
 def generate_shap_plot(shap_values, feature_values, base_value, features_info):
     """生成SHAP瀑布图（改进中文字体支持）"""
@@ -567,6 +546,7 @@ def main():
         st.info(f"""
         **模型类型**: {features_info['best_model_name']}  
         **特征数量**: {len(features_info['selected_features'])}  
+        **AUC**: {features_info.get('best_auc', 'N/A')}
         """)
 
         st.markdown("### 📋 使用说明")
